@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Life Tracker</title>
+  <style>
+    :root { --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --accent: #007bff; --border: #333; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 12px; margin: 0; font-size: 15px; }
+    h3 { margin-top: 0; border-bottom: 2px solid var(--border); padding-bottom: 8px; color: var(--accent); font-size: 1.3rem; }
+    h4 { margin: 8px 0 4px 0; color: #fff; border-bottom: 1px dashed #444; padding-bottom: 4px; }
+    
+    .nav-container { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 15px; margin-bottom: 10px; border-bottom: 1px solid var(--border); scrollbar-width: none; }
+    .nav-container::-webkit-scrollbar { display: none; }
+    .nav-btn { flex: 0 0 auto; padding: 12px 16px; background: var(--card); border: 1px solid var(--border); color: var(--text); border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; font-size: 14px; }
+    .nav-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+    
+    .global-btn { background: #ff9800; color: #000; border: none; padding: 12px; font-weight: bold; border-radius: 8px; width: 100%; margin-bottom: 15px; font-size: 1.1rem; text-transform: uppercase; cursor: pointer; }
+    .global-btn:active { background: #e68a00; }
+
+    .module { display: none; padding-bottom: 20px;}
+    .module.active { display: block; animation: fadeIn 0.2s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .dynamic-block { border-left: 4px solid var(--accent); padding-left: 12px; margin: 12px 0; background: #1a1a1a; padding: 12px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    label { display: block; font-size: 0.85rem; color: #aaa; margin-top: 12px; margin-bottom: 6px; font-weight: 500; }
+    input, select, textarea { width: 100%; padding: 14px; margin-bottom: 8px; box-sizing: border-box; background: #2a2a2a; color: white; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; }
+    input:focus, select:focus { outline: none; border-color: var(--accent); }
+    
+    .checkbox-group { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid var(--border); flex-wrap: wrap; }
+    .checkbox-group input[type="checkbox"], .checkbox-group input[type="radio"] { width: 22px; height: 22px; margin: 0; accent-color: var(--accent); }
+    
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .submit-btn { background: #28a745; color: white; border: none; padding: 16px; font-size: 1.1rem; font-weight: bold; margin-top: 15px; border-radius: 8px; width: 100%; text-transform: uppercase; cursor: pointer;}
+    .submit-btn:active { background: #218838; }
+    
+    .food-checks { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 14px; margin: 8px 0; }
+    .food-checks label { display: flex; align-items: center; gap: 5px; margin: 0; color: white; font-weight: normal; }
+    .food-checks input { width: 16px; height: 16px; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <div class="nav-container">
+    <button class="nav-btn active" onclick="openTab('Financials', this)">Financials</button>
+    <button class="nav-btn" onclick="openTab('Habits', this)">Habits</button>
+    <button class="nav-btn" onclick="openTab('Entertainment', this)">Media</button>
+    <button class="nav-btn" onclick="openTab('Academics', this)">Academics</button>
+    <button class="nav-btn" onclick="openTab('Health', this)">Health & Logistics</button>
+    <button class="nav-btn" onclick="openTab('Psych', this)">Psych Notes</button>
+    <button class="nav-btn" onclick="openTab('Projects', this)">Projects & Assets</button>
+  </div>
+
+  <button class="global-btn" id="global-submit" onclick="submitAllData()">Submit All Data Across Tabs</button>
+
+  <!-- MODULE 1: FINANCIALS -->
+  <div id="Financials" class="module active">
+    <h3>Financials Log</h3>
+    <form id="form-Financials">
+      <label>Entry Type</label>
+      <select id="fin-type" onchange="toggleFinType()">
+        <option value="">-- Select --</option>
+        <option value="Expense">Expense</option>
+        <option value="Income">Income</option>
+      </select>
+
+      <div id="fin-expense-cats" style="display:none;">
+        <label>Expense Categories</label>
+        <div class="checkbox-group"><input type="checkbox" value="Food" onchange="toggleFinInput(this)"> Food</div>
+        <div class="checkbox-group"><input type="checkbox" value="Drinks" onchange="toggleFinInput(this)"> Drinks</div>
+        <div class="checkbox-group"><input type="checkbox" value="Subscription" onchange="toggleFinInput(this)"> Subscription</div>
+        <div class="checkbox-group"><input type="checkbox" value="Transport" onchange="toggleFinInput(this)"> Transport</div>
+        <div class="checkbox-group"><input type="checkbox" value="Gifts" onchange="toggleFinInput(this)"> Gifts</div>
+        <div class="checkbox-group"><input type="checkbox" value="Shopping" onchange="toggleFinInput(this)"> Shopping</div>
+        <div class="checkbox-group"><input type="checkbox" value="Books" onchange="toggleFinInput(this)"> Books</div>
+        <div class="checkbox-group"><input type="checkbox" value="Academic" onchange="toggleFinInput(this)"> Academic</div>
+        <div class="checkbox-group"><input type="checkbox" value="Religious" onchange="toggleFinInput(this)"> Religious</div>
+        <div class="checkbox-group"><input type="checkbox" value="Home" onchange="toggleFinInput(this)"> Home</div>
+        <div class="checkbox-group"><input type="checkbox" value="Others" onchange="toggleFinInput(this)"> Others (Specify)</div>
+      </div>
+
+      <div id="fin-income-cats" style="display:none;">
+        <label>Income Categories</label>
+        <div class="checkbox-group"><input type="checkbox" value="Gift" onchange="toggleFinInput(this)"> Gift</div>
+        <div class="checkbox-group"><input type="checkbox" value="Loan" onchange="toggleFinInput(this)"> Loan</div>
+        <div class="checkbox-group"><input type="checkbox" value="Mum" onchange="toggleFinInput(this)"> Mum</div>
+        <div class="checkbox-group"><input type="checkbox" value="Dad" onchange="toggleFinInput(this)"> Dad</div>
+        <div class="checkbox-group"><input type="checkbox" value="Family" onchange="toggleFinInput(this)"> Family</div>
+        <div class="checkbox-group"><input type="checkbox" value="Profit" onchange="toggleFinInput(this)"> Profit</div>
+        <div class="checkbox-group"><input type="checkbox" value="Wages" onchange="toggleFinInput(this)"> Wages</div>
+      </div>
+
+      <div id="fin-dynamic-inputs"></div>
+      <button type="button" class="submit-btn" onclick="submitModule('form-Financials', gatherFinancials)">Save Financials Only</button>
+    </form>
+  </div>
+
+  <!-- MODULE 3: HABITS -->
+  <div id="Habits" class="module">
+    <h3>Sexual Habits</h3>
+    <form id="form-Habits">
+      <label>Entry Mode</label>
+      <select id="hab-mode" onchange="toggleHabitMode()">
+        <option value="Single">Single Instance</option>
+        <option value="Multiple">Multiple Instances</option>
+      </select>
+
+      <div id="hab-qty-block" style="display:none;">
+        <label>Number of Instances</label>
+        <input type="number" id="hab-inst-count" value="1" placeholder="How many instances?" oninput="renderHabitBlocks()">
+      </div>
+
+      <div id="hab-instances-container"></div>
+      <button type="button" class="submit-btn" onclick="submitModule('form-Habits', gatherHabits)">Save Habits Only</button>
+    </form>
+  </div>
+
+  <!-- MODULE 4: ENTERTAINMENT -->
+  <div id="Entertainment" class="module">
+    <h3>Media & Entertainment</h3>
+    <form id="form-Entertainment">
+      
+      <label>Gaming (Check Genres Played)</label>
+      <div class="checkbox-group"><input type="checkbox" value="Shooting" onchange="genGameBlock(this)"> Shooting</div>
+      <div class="checkbox-group"><input type="checkbox" value="Fighting" onchange="genGameBlock(this)"> Fighting</div>
+      <div class="checkbox-group"><input type="checkbox" value="Strategy" onchange="genGameBlock(this)"> Strategy</div>
+      <div class="checkbox-group"><input type="checkbox" value="Idle" onchange="genGameBlock(this)"> Idle</div>
+      <div class="checkbox-group"><input type="checkbox" value="Other" onchange="genGameBlock(this)"> Other (Specify)</div>
+      <div id="ent-games-container"></div>
+
+      <label>Social Media (Check Platforms)</label>
+      <div class="checkbox-group"><input type="checkbox" value="YouTube" onchange="genSocialBlock(this)"> YouTube</div>
+      <div class="checkbox-group"><input type="checkbox" value="IG" onchange="genSocialBlock(this)"> IG</div>
+      <div class="checkbox-group"><input type="checkbox" value="TikTok" onchange="genSocialBlock(this)"> TikTok</div>
+      <div class="checkbox-group"><input type="checkbox" value="WhatsApp" onchange="genSocialBlock(this)"> WhatsApp</div>
+      <div class="checkbox-group"><input type="checkbox" value="FB" onchange="genSocialBlock(this)"> FB</div>
+      <div id="ent-social-container"></div>
+
+      <label>Movies & Novels (Quantities)</label>
+      <div class="grid-2">
+        <input type="number" id="ent-mov-count" placeholder="# Movies" oninput="genMediaBlock(this.value, 'Movie', 'ent-mov-container')">
+        <input type="number" id="ent-nov-count" placeholder="# Novels" oninput="genMediaBlock(this.value, 'Novel', 'ent-nov-container')">
+      </div>
+      <div id="ent-mov-container"></div>
+      <div id="ent-nov-container"></div>
+
+      <button type="button" class="submit-btn" onclick="submitModule('form-Entertainment', gatherEntertainment)">Save Media Only</button>
+    </form>
+  </div>
+
+  <!-- MODULE 5: ACADEMICS -->
+  <div id="Academics" class="module">
+    <h3>Academics & Tests</h3>
+    <form id="form-Academics">
+      <label>Log Type</label>
+      <div class="checkbox-group"><input type="checkbox" id="acad-primary" onchange="toggleAcad()"> Primary Study</div>
+      <div class="checkbox-group"><input type="checkbox" id="acad-revision" onchange="toggleAcad()"> Revision</div>
+      <div class="checkbox-group"><input type="checkbox" id="acad-test" onchange="toggleAcad()"> Test</div>
+
+      <div id="acad-study-section" style="display:none;">
+        <label>Subjects Studied/Revised</label>
+        <div class="checkbox-group"><input type="checkbox" value="Gross Anatomy" onchange="genAcadSub(this)"> Gross Anatomy</div>
+        <div class="checkbox-group"><input type="checkbox" value="Histology" onchange="genAcadSub(this)"> Histology</div>
+        <div class="checkbox-group"><input type="checkbox" value="Embryology" onchange="genAcadSub(this)"> Embryology</div>
+        <div class="checkbox-group"><input type="checkbox" value="Physiology" onchange="genAcadSub(this)"> Physiology</div>
+        <div class="checkbox-group"><input type="checkbox" value="Biochemistry" onchange="genAcadSub(this)"> Biochemistry</div>
+        <div class="checkbox-group"><input type="checkbox" value="Clinical Skills" onchange="genAcadSub(this)"> Clinical Skills</div>
+        <div class="checkbox-group"><input type="checkbox" value="Community Medicine" onchange="genAcadSub(this)"> Community Med</div>
+        <div class="checkbox-group"><input type="checkbox" value="Entrepreneurship" onchange="genAcadSub(this)"> Entrepreneurship</div>
+        <div id="acad-dynamic-subjects"></div>
+      </div>
+
+      <div id="acad-test-section" style="display:none;">
+        <label>Subjects Tested</label>
+        <div class="checkbox-group"><input type="checkbox" value="Gross Anatomy" onchange="genTestSub(this)"> Gross Anatomy</div>
+        <div class="checkbox-group"><input type="checkbox" value="Histology" onchange="genTestSub(this)"> Histology</div>
+        <div class="checkbox-group"><input type="checkbox" value="Embryology" onchange="genTestSub(this)"> Embryology</div>
+        <div class="checkbox-group"><input type="checkbox" value="Physiology" onchange="genTestSub(this)"> Physiology</div>
+        <div class="checkbox-group"><input type="checkbox" value="Biochemistry" onchange="genTestSub(this)"> Biochemistry</div>
+        <div class="checkbox-group"><input type="checkbox" value="Clinical Skills" onchange="genTestSub(this)"> Clinical Skills</div>
+        <div class="checkbox-group"><input type="checkbox" value="Community Medicine" onchange="genTestSub(this)"> Community Med</div>
+        <div class="checkbox-group"><input type="checkbox" value="Entrepreneurship" onchange="genTestSub(this)"> Entrepreneurship</div>
+        <div id="acad-dynamic-tests"></div>
+      </div>
+      
+      <button type="button" class="submit-btn" onclick="submitModule('form-Academics', gatherAcademics)">Save Academics Only</button>
+    </form>
+  </div>
+
+  <!-- MODULE 6: HEALTH & LOGISTICS -->
+  <div id="Health" class="module">
+    <h3>Health, Logistics & Food</h3>
+    <form id="form-Health">
+      <label>Time Management (Sleep)</label>
+      <div class="grid-2">
+        <input type="number" id="hlth-sleep" placeholder="Hrs Sleep">
+        <input type="number" id="hlth-nap" placeholder="Hrs Nap">
+      </div>
+      
+      <label>Transport Mode</label>
+      <div class="checkbox-group"><input type="checkbox" value="Walking" onchange="genTransport(this)"> Walking</div>
+      <div class="checkbox-group"><input type="checkbox" value="Bike" onchange="genTransport(this)"> Bike</div>
+      <div class="checkbox-group"><input type="checkbox" value="Trike" onchange="genTransport(this)"> Trike</div>
+      <div class="checkbox-group"><input type="checkbox" value="Car" onchange="genTransport(this)"> Car</div>
+      <div class="checkbox-group"><input type="checkbox" value="Other" onchange="genTransport(this)"> Other (Specify)</div>
+      <div id="hlth-trans-container"></div>
+
+      <label>Food Log</label>
+      <div id="food-container"></div>
+      
+      <button type="button" class="submit-btn" onclick="submitModule('form-Health', gatherHealth)">Save Health & Logistics Only</button>
+    </form>
+  </div>
+
+  <!-- MODULE 7: PSYCH NOTES -->
+  <div id="Psych" class="module">
+    <h3>Psychological Notes</h3>
+    <form id="form-Psych">
+      <label>Dominant Emotion</label>
+      <div class="checkbox-group"><input type="radio" name="psy-em" value="Happy"> Happy <input type="radio" name="psy-em" value="Neutral" checked> Neutral <input type="radio" name="psy-em" value="Sad"> Sad</div>
+      
+      <label>Perspective of Day</label>
+      <select id="psy-persp">
+        <option value="">-- Select --</option>
+        <option>Successful</option>
+        <option>Neutral</option>
+        <option>Failed</option>
+      </select>
+      
+      <label>New Idea Generated?</label>
+      <select id="psy-idea-yn" onchange="document.getElementById('psy-idea-det').style.display = this.value === 'Yes' ? 'block' : 'none'">
+        <option value="">-- Select --</option>
+        <option>No</option>
+        <option>Yes</option>
+      </select>
+      
+      <div id="psy-idea-det" style="display:none;" class="dynamic-block">
+        <select id="psy-cat"><option value="">-- Category --</option><option>Study</option><option>Business</option><option>Personal</option></select>
+        <textarea id="psy-desc" placeholder="Describe the idea..." rows="3"></textarea>
+      </div>
+
+      <button type="button" class="submit-btn" onclick="submitModule('form-Psych', gatherPsych)">Save Psych Notes Only</button>
+    </form>
+  </div>
+
+  <!-- MODULE 8: PROJECTS -->
+  <div id="Projects" class="module">
+    <h3>Projects & Assets</h3>
+    <form id="form-Projects">
+      
+      <label>Development & Creative</label>
+      <div class="checkbox-group"><input type="checkbox" value="Software Dev" onchange="genProjBlock(this, 'dev')"> Software Dev</div>
+      <div class="checkbox-group"><input type="checkbox" value="Creative Writing" onchange="genProjBlock(this, 'dev')"> Creative Writing</div>
+      <div class="checkbox-group"><input type="checkbox" value="Business Planning" onchange="genProjBlock(this, 'dev')"> Business Plan</div>
+      <div id="proj-dev-container"></div>
+
+      <label>Hardware & EV Simulation</label>
+      <div class="checkbox-group"><input type="checkbox" id="proj-hw" onchange="document.getElementById('hw-block').style.display = this.checked ? 'block' : 'none'"> Hardware Variables</div>
+      <div id="hw-block" class="dynamic-block" style="display:none;">
+         <input type="number" id="hw-grid" placeholder="Grid Power Hrs Available">
+         <input type="number" id="hw-temp" placeholder="Ambient Temp (C)">
+         <input type="number" id="hw-solar" placeholder="Solar/Battery Yield (%)">
+      </div>
+
+      <label>Agriculture Logistics</label>
+      <div class="checkbox-group"><input type="checkbox" value="Poultry (Noiler)" onchange="genAgricBlock(this)"> Poultry (Noiler)</div>
+      <div class="checkbox-group"><input type="checkbox" value="Crops (Onions)" onchange="genAgricBlock(this)"> Crops (Onions)</div>
+      <div id="proj-agric-container"></div>
+
+      <label>Outreach & Volunteering</label>
+      <div class="checkbox-group"><input type="checkbox" id="proj-out" onchange="document.getElementById('out-block').style.display = this.checked ? 'block' : 'none'"> Outreach Activity</div>
+      <div id="out-block" class="dynamic-block" style="display:none;">
+         <input type="text" id="out-unit" placeholder="Unit (e.g. Prison Counseling)">
+         <select id="out-act"><option value="">-- Select --</option><option>Direct Counseling</option><option>Logistical Support</option><option>Form Design</option></select>
+         <div class="time-grid"><input type="number" id="out-h" placeholder="Hrs"><input type="number" id="out-m" placeholder="Mins"></div>
+         <input type="number" id="out-int" placeholder="Interaction Count">
+      </div>
+
+      <button type="button" class="submit-btn" onclick="submitModule('form-Projects', gatherProjects)">Save Projects Only</button>
+    </form>
+  </div>
+
+  <!-- JAVASCRIPT ENGINE -->
+  <script>
+    function openTab(t, b) {
+      document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(t).classList.add('active');
+      b.classList.add('active');
+    }
+    
+    function calcMins(h, m, s) { return (parseInt(h||0) * 60) + parseInt(m||0) + (parseInt(s||0) / 60); }
+    function checkSpec(sel, inp) { document.getElementById(inp).style.display = sel.value === "specify" ? "block" : "none"; }
+
+    // 1. Financials
+    function toggleFinType() {
+      const isExp = document.getElementById('fin-type').value === "Expense";
+      document.getElementById('fin-expense-cats').style.display = isExp ? "block" : "none";
+      document.getElementById('fin-income-cats').style.display = document.getElementById('fin-type').value === "Income" ? "block" : "none";
+      document.getElementById('fin-dynamic-inputs').innerHTML = '';
+      document.querySelectorAll('#form-Financials input[type="checkbox"]').forEach(cb => cb.checked = false);
+    }
+    function toggleFinInput(cb) {
+      const cont = document.getElementById('fin-dynamic-inputs');
+      const id = `fin-in-${cb.value.replace(/\s/g,'')}`;
+      if (cb.checked) {
+        let extra = cb.value === "Others" ? `<input type="text" id="${id}-spec" placeholder="Specify Detail" style="margin-bottom:8px;">` : "";
+        cont.innerHTML += `<div id="${id}" class="dynamic-block"><label>Amount for ${cb.value}</label>${extra}<input type="number" class="fin-amount" data-cat="${cb.value}" data-id="${id}" placeholder="Total Amount"></div>`;
+      } else { if(document.getElementById(id)) document.getElementById(id).remove(); }
+    }
+    function gatherFinancials() {
+      let entries = [];
+      document.querySelectorAll('.fin-amount').forEach(inp => {
+        let cat = inp.dataset.cat === "Others" ? (document.getElementById(`${inp.dataset.id}-spec`).value || "") : inp.dataset.cat;
+        if(inp.value) entries.push({ type: document.getElementById('fin-type').value, category: cat, amount: inp.value });
+      });
+      return { module: "Financials", entries: entries };
+    }
+
+    // 3. Habits
+    window.onload = function() { renderHabitBlocks(); initFoodLog(); };
+    function toggleHabitMode() {
+      document.getElementById('hab-qty-block').style.display = document.getElementById('hab-mode').value === "Multiple" ? "block" : "none";
+      renderHabitBlocks();
+    }
+    function toggleHabNSome(sel, id) { document.getElementById(id).style.display = sel.value === "N-some" ? "grid" : "none"; }
+    function renderHabitBlocks() {
+      const isMulti = document.getElementById('hab-mode').value === "Multiple";
+      let count = isMulti ? (parseInt(document.getElementById('hab-inst-count').value) || 1) : 1;
+      const cont = document.getElementById('hab-instances-container');
+      cont.innerHTML = '';
+      for(let i=1; i<=count; i++) {
+        cont.innerHTML += `
+        <div class="dynamic-block h-blk" data-idx="${i}">
+          <h4>Instance ${i}</h4>
+          <label>Type</label>
+          <select class="h-type" onchange="toggleHabNSome(this, 'h-ns-${i}')"><option value="">-- Select --</option><option>Masturbation</option><option>Duet</option><option>N-some</option></select>
+          <div id="h-ns-${i}" class="grid-2" style="display:none; margin-bottom:8px;">
+            <input type="number" class="h-m" placeholder="# Male"><input type="number" class="h-f" placeholder="# Female">
+          </div>
+          <div class="grid-2">
+            <div><label>Trigger</label><select class="h-trig"><option value="">-- Select --</option><option>Porn</option><option>Imagination</option><option>Real View</option><option>Offer</option></select></div>
+            <div><label>Medium</label><select class="h-med"><option value="">-- Select --</option><option>Video</option><option>Comic</option><option>Novel</option><option>Individual</option></select></div>
+          </div>
+          <label>Time & Duration</label>
+          <div class="grid-2" style="margin-bottom:8px;"><select class="h-tm"><option value="">-- Select --</option><option>Night</option><option>Day</option></select></div>
+          <div class="time-grid"><input type="number" class="h-dh" placeholder="H"><input type="number" class="h-dm" placeholder="M"><input type="number" class="h-ds" placeholder="S"></div>
+          <div class="grid-2">
+            <div><label>Afterwards</label><select class="h-aft" onchange="checkSpec(this, 'h-aft-sp-${i}')"><option value="">-- Select --</option><option>Sleep</option><option>Work</option><option>Study</option><option>Leisure</option><option value="specify">Specify</option></select><input type="text" id="h-aft-sp-${i}" class="h-aft-sp" placeholder="Specify..." style="display:none; margin-top:5px;"></div>
+            <div><label>Object</label><select class="h-obj" onchange="checkSpec(this, 'h-obj-sp-${i}')"><option value="">-- Select --</option><option>Bed</option><option>Pillow</option><option>Condom</option><option value="specify">Specify</option></select><input type="text" id="h-obj-sp-${i}" class="h-obj-sp" placeholder="Specify..." style="display:none; margin-top:5px;"></div>
+          </div>
+        </div>`;
+      }
+    }
+    function gatherHabits() {
+      let entries = [];
+      document.querySelectorAll('.h-blk').forEach(b => {
+        let hType = b.querySelector('.h-type').value;
+        if(hType === 'N-some') hType = `N-some (${b.querySelector('.h-m').value||0}M, ${b.querySelector('.h-f').value||0}F)`;
+        let aft = b.querySelector('.h-aft').value === "specify" ? (b.querySelector('.h-aft-sp').value || "") : b.querySelector('.h-aft').value;
+        let obj = b.querySelector('.h-obj').value === "specify" ? (b.querySelector('.h-obj-sp').value || "") : b.querySelector('.h-obj').value;
+        
+        if(b.querySelector('.h-dm').value || b.querySelector('.h-dh').value) {
+            entries.push({
+            encounter: hType || "", instance: b.dataset.idx, trigger: b.querySelector('.h-trig').value || "", medium: b.querySelector('.h-med').value || "",
+            time: b.querySelector('.h-tm').value || "", duration: calcMins(b.querySelector('.h-dh').value, b.querySelector('.h-dm').value, b.querySelector('.h-ds').value),
+            afterwards: aft || "", object: obj || ""
+            });
+        }
+      });
+      return { module: "Habits_Sexual", entries: entries };
+    }
+
+    // 4. Entertainment
+    function genGameBlock(cb) {
+      const cont = document.getElementById('ent-games-container');
+      const id = `ent-gm-${cb.value.replace(/\s/g,'')}`;
+      if(cb.checked) {
+        let ex = cb.value === "Other" ? `<input type="text" id="${id}-sp" placeholder="Specify Genre" style="margin-bottom:8px;">` : "";
+        cont.innerHTML += `<div id="${id}" class="dynamic-block ent-gm-blk" data-genre="${cb.value}" data-id="${id}"><h4>Game: ${cb.value}</h4>${ex}<div class="time-grid"><input type="number" class="eg-h" placeholder="H"><input type="number" class="eg-m" placeholder="M"><input type="number" class="eg-s" placeholder="S"></div><div class="grid-2"><select class="eg-tm"><option value="">-- Time --</option><option>Day</option><option>Night</option></select><select class="eg-tl"><option value="">-- Timeline --</option><option>After Study</option><option>Within Study</option><option>Before Study</option></select></div><div class="grid-2" style="margin-top:8px;"><div><label>Afterwards</label><select class="eg-aft" onchange="checkSpec(this, '${id}-aft-sp')"><option value="">-- Select --</option><option>Sleep</option><option>Work</option><option>Study</option><option>Leisure</option><option value="specify">Specify</option></select></div><input type="text" id="${id}-aft-sp" class="eg-aft-sp" placeholder="Specify..." style="display:none; margin-top:28px;"></div></div>`;
+      } else { if(document.getElementById(id)) document.getElementById(id).remove(); }
+    }
+    function genSocialBlock(cb) {
+      const cont = document.getElementById('ent-social-container');
+      const id = `ent-soc-${cb.value.replace(/\s/g,'')}`;
+      if(cb.checked) {
+        cont.innerHTML += `
+        <div id="${id}" class="dynamic-block ent-soc-blk" data-plat="${cb.value}">
+          <h4>${cb.value}</h4>
+          <label>Select Purposes</label>
+          <div class="checkbox-group" style="font-size:12px;">
+            <label><input type="checkbox" onchange="toggleSocTime(this, '${id}', 'Edu')"> Edu</label> 
+            <label><input type="checkbox" onchange="toggleSocTime(this, '${id}', 'Relig')"> Relig</label> 
+            <label><input type="checkbox" onchange="toggleSocTime(this, '${id}', 'Dev')"> Dev</label> 
+            <label><input type="checkbox" onchange="toggleSocTime(this, '${id}', 'Ent')"> Ent</label>
+            <label><input type="checkbox" onchange="toggleSocTime(this, '${id}', 'Other')"> Other</label>
+          </div>
+          <div id="${id}-times"></div>
+        </div>`;
+      } else { if(document.getElementById(id)) document.getElementById(id).remove(); }
+    }
+    function toggleSocTime(cb, parentId, purp) {
+      const cont = document.getElementById(parentId + '-times');
+      const timeId = `${parentId}-tm-${purp}`;
+      if(cb.checked) {
+        let spec = purp === 'Other' ? `<input type="text" class="sp-spec" placeholder="Specify other purpose..." style="margin-bottom:8px;">` : ``;
+        cont.innerHTML += `
+        <div id="${timeId}" class="soc-purp-time" data-purp="${purp}" style="margin-top:10px; border-top:1px dashed #444; padding-top:10px;">
+          <label>${purp} Duration</label>
+          ${spec}
+          <div class="time-grid"><input type="number" class="sp-h" placeholder="H"><input type="number" class="sp-m" placeholder="M"><input type="number" class="sp-s" placeholder="S"></div>
+        </div>`;
+      } else { if(document.getElementById(timeId)) document.getElementById(timeId).remove(); }
+    }
+    function genMediaBlock(val, type, contId) {
+      const cont = document.getElementById(contId);
+      cont.innerHTML = '';
+      for(let i=1; i<=val; i++) {
+        cont.innerHTML += `<div class="dynamic-block ent-med-blk" data-type="${type}"><h4>${type} ${i}</h4><select class="em-gen"><option value="">-- Genre --</option><option>Action</option><option>Horror</option><option>Romance</option><option>Drama</option></select><input type="text" class="em-tit" placeholder="Title"><div class="time-grid"><input type="number" class="em-h" placeholder="H"><input type="number" class="em-m" placeholder="M"><input type="number" class="em-s" placeholder="S"></div></div>`;
+      }
+    }
+    function gatherEntertainment() {
+      let entries = [];
+      document.querySelectorAll('.ent-gm-blk').forEach(b => {
+        let g = b.dataset.genre === "Other" ? (document.getElementById(`${b.dataset.id}-sp`).value || "") : b.dataset.genre;
+        let aft = b.querySelector('.eg-aft').value === "specify" ? (b.querySelector('.eg-aft-sp').value || "") : b.querySelector('.eg-aft').value;
+        let timelineComb = `${b.querySelector('.eg-tl').value || ""} | Aft: ${aft}`;
+        if(b.querySelector('.eg-m').value || b.querySelector('.eg-h').value) entries.push({ media: "Gaming", genre: g, title: "", duration: calcMins(b.querySelector('.eg-h').value, b.querySelector('.eg-m').value, b.querySelector('.eg-s').value), time: b.querySelector('.eg-tm').value || "", timeline: timelineComb });
+      });
+      document.querySelectorAll('.ent-soc-blk').forEach(b => {
+        let totalMins = 0; let details = []; let genres = [];
+        b.querySelectorAll('.soc-purp-time').forEach(pBlock => {
+            let pName = pBlock.dataset.purp;
+            if(pName === 'Other') { let specVal = pBlock.querySelector('.sp-spec').value; pName = specVal ? `Other (${specVal})` : "Other"; }
+            let mins = calcMins(pBlock.querySelector('.sp-h').value, pBlock.querySelector('.sp-m').value, pBlock.querySelector('.sp-s').value);
+            if(mins > 0) { totalMins += mins; details.push(`${pName}: ${Math.round(mins)}m`); genres.push(pName); }
+        });
+        if(totalMins > 0) entries.push({ media: "Social", genre: genres.join(", ") || "", title: b.dataset.plat, duration: totalMins, time: "", timeline: details.join(" | ") });
+      });
+      document.querySelectorAll('.ent-med-blk').forEach(b => {
+        if(b.querySelector('.em-m').value || b.querySelector('.em-h').value) entries.push({ media: b.dataset.type, genre: b.querySelector('.em-gen').value || "", title: b.querySelector('.em-tit').value || "", duration: calcMins(b.querySelector('.em-h').value, b.querySelector('.em-m').value, b.querySelector('.em-s').value), time: "", timeline: "" });
+      });
+      return { module: "Entertainment", entries: entries };
+    }
+
+    // 5. Academics
+    function toggleAcad() {
+      let s = document.getElementById('acad-primary').checked || document.getElementById('acad-revision').checked;
+      document.getElementById('acad-study-section').style.display = s ? "block" : "none";
+      document.getElementById('acad-test-section').style.display = document.getElementById('acad-test').checked ? "block" : "none";
+    }
+    function genAcadSub(cb) {
+      const cont = document.getElementById('acad-dynamic-subjects');
+      const id = `ac-sub-${cb.value.replace(/\s/g,'')}`;
+      if (cb.checked) {
+        let revFields = document.getElementById('acad-revision').checked ? `<label>Revision Observations</label><div class="time-grid"><input type="number" class="ac-con" placeholder="Consults(1-10)"><input type="number" class="ac-wr" placeholder="Wrong"><input type="number" class="ac-bl" placeholder="Blank"></div>` : "";
+        cont.innerHTML += `<div id="${id}" class="dynamic-block ac-st-blk" data-sub="${cb.value}"><h4>${cb.value}</h4><input type="text" class="ac-top" placeholder="Topic"><div class="time-grid"><input type="number" class="ac-h" placeholder="H"><input type="number" class="ac-m" placeholder="M"><input type="number" class="ac-s" placeholder="S"></div><div class="grid-2"><div><select class="ac-med"><option value="">-- Medium --</option><option>Video</option><option>Books</option><option>Audio</option><option>Inter. Human</option><option>Inter. AI</option></select></div><div><select class="ac-mod"><option value="">-- Mode --</option><option>Digital</option><option>Physical</option></select></div></div>${revFields}</div>`;
+      } else { if(document.getElementById(id)) document.getElementById(id).remove(); }
+    }
+    function genTestSub(cb) {
+      const cont = document.getElementById('acad-dynamic-tests');
+      const id = `ac-tst-${cb.value.replace(/\s/g,'')}`;
+      if (cb.checked) {
+        cont.innerHTML += `<div id="${id}" class="dynamic-block ac-ts-blk" data-sub="${cb.value}"><h4>${cb.value}</h4><label>Test Details</label><select class="ts-set"><option value="">-- Type --</option><option>Official</option><option>Mock</option><option>Personal</option></select><div class="grid-2"><input type="number" class="ts-dur" placeholder="Duration (Mins)"><input type="number" class="ts-sco" placeholder="Score"></div><label>Finished on time?</label><select class="ts-fin"><option value="">-- Select --</option><option>Yes</option><option>No</option></select><div class="grid-2"><input type="number" class="ts-ans" placeholder="% Answered"><input type="number" class="ts-sur" placeholder="% Sure"></div></div>`;
+      } else { if(document.getElementById(id)) document.getElementById(id).remove(); }
+    }
+    function gatherAcademics() {
+      let entries = [];
+      let logTypes = [];
+      if(document.getElementById('acad-primary').checked) logTypes.push("Primary Study");
+      if(document.getElementById('acad-revision').checked) logTypes.push("Revision");
+      let typeString = logTypes.join(" & ");
+
+      document.querySelectorAll('.ac-st-blk').forEach(b => {
+         entries.push({ 
+             log_type: typeString, subject: b.dataset.sub, topic: b.querySelector('.ac-top').value || "", 
+             duration: calcMins(b.querySelector('.ac-h').value, b.querySelector('.ac-m').value, b.querySelector('.ac-s').value), 
+             medium: b.querySelector('.ac-med').value || "", mode: b.querySelector('.ac-mod').value || "", 
+             consult: (b.querySelector('.ac-con') ? b.querySelector('.ac-con').value : "") || "", 
+             wrong: (b.querySelector('.ac-wr') ? b.querySelector('.ac-wr').value : "") || "", 
+             blank: (b.querySelector('.ac-bl') ? b.querySelector('.ac-bl').value : "") || "" 
+         });
+      });
+      document.querySelectorAll('.ac-ts-blk').forEach(b => {
+         entries.push({ 
+             log_type: "Test", subject: b.dataset.sub, topic: b.querySelector('.ts-set').value || "", 
+             duration: b.querySelector('.ts-dur').value || "", 
+             medium: "", mode: "", 
+             consult: b.querySelector('.ts-ans').value || "", wrong: b.querySelector('.ts-sur').value || "", blank: b.querySelector('.ts-sco').value || "" 
+         });
+      });
+      return { module: "Academics_Study", entries: entries };
+    }
+
+    // 6. Health & Logistics
+    function initFoodLog() {
+      const meals = ['Morning', 'Afternoon', 'Evening', 'Night'];
+      const cont = document.getElementById('food-container');
+      const fC = ['Proteins', 'Carbohydrates', 'Fats', 'Vitamins', 'Minerals', 'Water'];
+      let clH = fC.map(c => `<label><input type="checkbox" class="f-cls" value="${c}"> ${c}</label>`).join('');
+      meals.forEach(m => {
+        cont.innerHTML += `<div class="dynamic-block f-meal-blk" data-meal="${m}"><h4>${m} Meal</h4><select class="f-ate" onchange="document.getElementById('f-det-${m}').style.display = this.value === 'Ate' ? 'block' : 'none'"><option value="">-- Select Status --</option><option value="Ate">Ate</option><option value="Did Not Eat">Did Not Eat</option></select><div id="f-det-${m}" style="display:none;"><div class="food-checks">${clH}</div><input type="text" class="f-src" placeholder="Source (e.g. Rice, Beans, Egg)"></div></div>`;
+      });
+    }
+    function genTransport(cb) {
+      const cont = document.getElementById('hlth-trans-container');
+      const id = `tr-${cb.value.replace(/\s/g,'')}`;
+      if (cb.checked) {
+        let ex = cb.value === "Other" ? `<input type="text" id="${id}-sp" placeholder="Specify Transport" style="margin-bottom:8px;">` : "";
+        cont.innerHTML += `<div id="${id}" class="dynamic-block tr-blk" data-mode="${cb.value}" data-id="${id}"><h4>Transport: ${cb.value}</h4>${ex}<div class="grid-2"><input type="number" class="tr-tgo" placeholder="Mins Going" oninput="this.nextElementSibling.value = this.value"><input type="number" class="tr-tret" placeholder="Mins Return" onfocus="this.select()"><input type="number" class="tr-cgo" placeholder="Cost Going" oninput="this.nextElementSibling.value = this.value"><input type="number" class="tr-cret" placeholder="Cost Return" onfocus="this.select()"></div><label>Destination</label><select class="tr-dest" onchange="checkSpec(this, '${id}-dest-sp')"><option value="">-- Select --</option><option>School</option><option>Home</option><option>Church</option><option>Market</option><option value="specify">Other (Specify)</option></select><input type="text" id="${id}-dest-sp" class="tr-dest-sp" placeholder="Specify destination..." style="display:none; margin-top:8px;"></div>`;
+      } else { if(document.getElementById(id)) document.getElementById(id).remove(); }
+    }
+    function gatherHealth() {
+      let entries = [];
+      if(document.getElementById('hlth-sleep').value || document.getElementById('hlth-nap').value) {
+          entries.push({ category: "Sleep", sub_category: "Cycle", metric1: document.getElementById('hlth-sleep').value || "", metric2: document.getElementById('hlth-nap').value || "", metric3: "", metric4: "", dest_source: "Home" });
+      }
+      document.querySelectorAll('.tr-blk').forEach(b => {
+        let mode = b.dataset.mode === "Other" ? (document.getElementById(`${b.dataset.id}-sp`).value || "") : b.dataset.mode;
+        let dest = b.querySelector('.tr-dest').value === "specify" ? (b.querySelector('.tr-dest-sp').value || "") : b.querySelector('.tr-dest').value;
+        let tGo = b.querySelector('.tr-tgo').value;
+        let tRet = b.querySelector('.tr-tret').value;
+        let cGo = b.querySelector('.tr-cgo').value;
+        let cRet = b.querySelector('.tr-cret').value;
+        if(tGo || cGo) entries.push({ category: "Transport", sub_category: mode || "", metric1: tGo || "", metric2: tRet || "", metric3: cGo || "", metric4: cRet || "", dest_source: dest || "" });
+      });
+      document.querySelectorAll('.f-meal-blk').forEach(b => {
+        let status = b.querySelector('.f-ate').value;
+        if(status === 'Ate') {
+           let cls = Array.from(b.querySelectorAll('.f-cls:checked')).map(cb => cb.value).join(", ") || "";
+           entries.push({ category: "Nutrition", sub_category: b.dataset.meal, metric1: status, metric2: cls, metric3: "", metric4: "", dest_source: b.querySelector('.f-src').value || "" });
+        }
+      });
+      return { module: "Health_Logistics", entries: entries };
+    }
+
+    // 7. Psych Notes
+    function gatherPsych() {
+      let entries = [];
+      let em = document.querySelector('input[name="psy-em"]:checked') ? document.querySelector('input[name="psy-em"]:checked').value : "";
+      let persp = document.getElementById('psy-persp').value;
+      let ideaYn = document.getElementById('psy-idea-yn').value;
+      
+      if(em || persp || ideaYn) {
+          entries.push({ emotion: em || "", perspective: persp || "", new_idea: ideaYn || "", idea_cat: document.getElementById('psy-cat').value || "", idea_desc: document.getElementById('psy-desc').value || "" });
+      }
+      return { module: "Psych_Notes", entries: entries };
+    }
+
+    // 8. Projects
+    function genProjBlock(cb, type) {
+      const cont = document.getElementById(`proj-${type}-container`);
+      const id = `prj-${cb.value.replace(/\s/g,'')}`;
+      if(cb.checked) {
+        cont.innerHTML += `<div id="${id}" class="dynamic-block prj-blk" data-cat="${cb.value}"><h4>${cb.value}</h4><input type="text" class="pj-nam" placeholder="Project Name"><div class="grid-2"><input type="number" class="pj-h" placeholder="Hrs"><input type="number" class="pj-m" placeholder="Mins"></div><input type="text" class="pj-out" placeholder="Output (Lines code, Words)"></div>`;
+      } else { if(document.getElementById(id)) document.getElementById(id).remove(); }
+    }
+    function genAgricBlock(cb) {
+      const cont = document.getElementById(`proj-agric-container`);
+      const id = `ag-${cb.value.replace(/\s/g,'')}`;
+      if(cb.checked) {
+        cont.innerHTML += `<div id="${id}" class="dynamic-block ag-blk" data-ast="${cb.value}"><h4>${cb.value}</h4><div class="checkbox-group" style="font-size:12px;"><label><input type="checkbox" class="ag-mnt" value="Fed"> Fed</label><label><input type="checkbox" class="ag-mnt" value="Watered"> Water</label><label><input type="checkbox" class="ag-mnt" value="Med"> Med</label></div><div class="grid-2"><input type="number" class="ag-inp" placeholder="Input Amt (Kg)"><input type="number" class="ag-yld" placeholder="Yield/Loss"></div></div>`;
+      } else { if(document.getElementById(id)) document.getElementById(id).remove(); }
+    }
+    function gatherProjects() {
+      let entries = [];
+      document.querySelectorAll('.prj-blk').forEach(b => {
+        if(b.querySelector('.pj-h').value || b.querySelector('.pj-m').value) entries.push({ category: b.dataset.cat, asset: b.querySelector('.pj-nam').value || "", task: "Dev Task", duration_input: calcMins(b.querySelector('.pj-h').value, b.querySelector('.pj-m').value, 0), output_yield: b.querySelector('.pj-out').value || "", grid: "", temp: "" });
+      });
+      if(document.getElementById('proj-hw').checked) {
+        entries.push({ category: "Hardware Variables", asset: "Environmental", task: "", duration_input: "", output_yield: document.getElementById('hw-solar').value || "", grid: document.getElementById('hw-grid').value || "", temp: document.getElementById('hw-temp').value || "" });
+      }
+      document.querySelectorAll('.ag-blk').forEach(b => {
+        let mnts = Array.from(b.querySelectorAll('.ag-mnt:checked')).map(c=>c.value).join(", ") || "";
+        if(b.querySelector('.ag-inp').value || b.querySelector('.ag-yld').value) entries.push({ category: "Agriculture", asset: b.dataset.ast, task: mnts, duration_input: b.querySelector('.ag-inp').value || "", output_yield: b.querySelector('.ag-yld').value || "", grid: "", temp: "" });
+      });
+      if(document.getElementById('proj-out').checked) {
+        entries.push({ category: "Outreach", asset: document.getElementById('out-unit').value || "", task: document.getElementById('out-act').value || "", duration_input: calcMins(document.getElementById('out-h').value, document.getElementById('out-m').value, 0), output_yield: document.getElementById('out-int').value || "", grid: "", temp: "" });
+      }
+      return { module: "Projects_Assets", entries: entries };
+    }
+
+    // --- MASTER SUBMITTERS ---
+    function submitModule(formId, gatherFunc) {
+      let payload = gatherFunc();
+      if (!payload || payload.entries.length === 0) return alert("Please fill out fields before saving.");
+      
+      const form = document.getElementById(formId);
+      const btn = form.querySelector('.submit-btn');
+      btn.innerText = "Saving Module...";
+      
+      google.script.run.withSuccessHandler(res => {
+        alert(res);
+        form.reset(); // Native reset
+
+        // Explicitly clear generated UI blocks safely
+        form.querySelectorAll('.dynamic-block').forEach(b => {
+           if(b.id.startsWith('fin-in') || b.id.startsWith('ac-sub') || b.id.startsWith('ac-tst') || b.id.startsWith('tr-') || b.classList.contains('h-inst') || b.id.startsWith('ent-gm-') || b.id.startsWith('ent-soc-') || b.classList.contains('ent-med-blk') || b.classList.contains('prj-blk') || b.classList.contains('ag-blk')) {
+             b.remove();
+           } else {
+             b.querySelectorAll('[id^="f-det-"]').forEach(d => d.style.display = "none");
+             b.querySelectorAll('input[type="text"], [id$="-sp"], [id$="-spec"]').forEach(i => {
+                 if(i.id && (i.id.includes('spec') || i.id.endsWith('-sp'))) i.style.display = "none";
+             });
+           }
+        });
+
+        // Re-hide module-specific structural toggles
+        if(formId === 'form-Financials') { document.getElementById('fin-expense-cats').style.display = "none"; document.getElementById('fin-income-cats').style.display = "none"; }
+        if(formId === 'form-Habits') { document.getElementById('hab-mult-config').style.display = "none"; document.getElementById('hab-single-config').style.display = "block"; renderHabitBlocks(); }
+        if(formId === 'form-Academics') { document.getElementById('acad-study-section').style.display = "none"; document.getElementById('acad-test-section').style.display = "none"; }
+        if(formId === 'form-Psych') { document.getElementById('psy-idea-det').style.display = "none"; }
+        if(formId === 'form-Projects') { document.getElementById('hw-block').style.display = "none"; document.getElementById('out-block').style.display = "none"; }
+
+        btn.innerText = "Save Module Only";
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // Smooth scroll, NO page reload
+      }).processPayload(JSON.stringify(payload));
+    }
+
+    async function submitAllData() {
+      let funcs = [gatherFinancials, gatherHabits, gatherEntertainment, gatherAcademics, gatherHealth, gatherPsych, gatherProjects];
+      let validPayloads = funcs.map(f => f()).filter(p => p && p.entries.length > 0);
+      
+      if(validPayloads.length === 0) return alert("All forms are currently empty.");
+      
+      const globalBtn = document.getElementById('global-submit');
+      globalBtn.innerText = "Uploading to Database...";
+      globalBtn.style.backgroundColor = "#ffc107";
+      
+      let completed = 0;
+      validPayloads.forEach(payload => {
+         google.script.run.withSuccessHandler(() => {
+            completed++;
+            if(completed === validPayloads.length) {
+               alert("SUCCESS: All data across all tabs has been securely logged.");
+               window.location.reload(); // Full reload ONLY when doing a global submit
+            }
+         }).processPayload(JSON.stringify(payload));
+      });
+    }
+  </script>
+</body>
+</html>

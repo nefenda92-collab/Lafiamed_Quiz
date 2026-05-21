@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lafiamed Quiz Portal</title>
+
+    <style>
+        /* Base scaling and body setup - stacking from top */
+        html {
+            font-size: 16px; 
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f8f9fa; /* Light grey base for full screen */
+            margin: 0;
+            display: flex;
+            flex-direction: column; /* Stack vertically from top */
+            min-height: 100vh; 
+            box-sizing: border-box;
+            padding: 0;
+        }
+
+        /* 1.1 App Header (new component) */
+        .app-header {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem 0; /* Vertical space for the logo */
+            background-color: #ffffff; /* Clean white header space */
+            border-bottom: 1px solid #e9ecef; /* Optional separator line */
+        }
+
+        /* 1.2 Logo Square */
+        .logo-square {
+            width: 80px; /* Specific square container size */
+            height: 80px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Optional stylized square border */
+            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            background-color: #f8f9fa;
+        }
+
+        /* 1.3 Login Content Area (was card container, now full width stack) */
+        .login-content {
+            background-color: transparent; /* No card background */
+            width: 90vw; 
+            max-width: 600px; /* Keep mobile centered, but allow width on tablets */
+            margin: 0 auto; /* Center the content stack horizontally */
+            text-align: left; /* Text alignment left for single lines */
+            box-sizing: border-box;
+            padding: 3rem 0; /* Padding above and below typography lines */
+        }
+
+        /* 1.4 Typography - Styled as single, distinct lines */
+        .login-content h2 {
+            margin: 0 0 1rem 0;
+            color: #212529;
+            font-size: 2rem; /* Distinctly large for app title */
+            line-height: 1.2;
+        }
+        .subtitle {
+            color: #6c757d;
+            margin: 0 0 2rem 0; /* Distinct space below subtitle */
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* 1.5 Button Wrapper (Centering container) */
+        .button-wrapper {
+            display: flex;
+            justify-content: center; /* Center the button within the stack */
+            padding: 1rem 0;
+        }
+
+        /* 1.6 Google Button Styling (Official standard) */
+        .google-btn {
+            background-color: #ffffff;
+            color: #3c4043;
+            font-weight: 500;
+            border: 1px solid #dadce0;
+            padding: 12px 14px;
+            width: auto; /* Width auto to not fill screen, as it's centered */
+            min-width: 280px; /* Minimum width for professional look */
+            border-radius: 4px;
+            font-size: 0.93rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-sizing: border-box;
+            margin: 0 auto; /* Extra horizontal centering assurance */
+        }
+        .google-btn:active {
+            background-color: #f8f9fa;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+        }
+    </style>
+    </head>
+<body>
+
+    <div class="app-header">
+        <div class="logo-square">
+            <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="lm-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#1abc9c;stop-opacity:1" /> <stop offset="100%" style="stop-color:#21467A;stop-opacity:1" /> </linearGradient>
+                </defs>
+                
+                <path d="M5,32 L20,32 L24,20 L28,32 L30,32 L34,44 L38,32 L53,32 L56,26 L60,32" 
+                      fill="none" 
+                      stroke="#e9ecef" 
+                      stroke-width="2" />
+                
+                <text x="32" y="38" 
+                      text-anchor="middle" 
+                      dominant-baseline="middle" 
+                      font-family="system-ui, -apple-system, sans-serif" 
+                      font-size="28" 
+                      font-weight="900" 
+                      fill="url(#lm-gradient)">LM</text>
+            </svg>
+        </div>
+    </div>
+    <div class="login-content">
+        <h2>Lafiamed Access</h2>
+        <p class="subtitle">Sign in with your Google account to access study modules and progress tracking.</p>
+        
+        <div class="button-wrapper">
+            <button class="google-btn" id="googleLoginBtn">
+                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                Continue with Google
+            </button>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // Replace these with your actual Firebase project keys later
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        document.getElementById('googleLoginBtn').addEventListener('click', () => {
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    const user = result.user;
+                    alert(`Login Successful. Welcome to Lafiamed, ${user.displayName}!`);
+                })
+                .catch((error) => {
+                    console.error("Error Code:", error.code);
+                    alert("Authentication failed: " + error.message);
+                });
+        });
+    </script>
+    </body>
+</html>
